@@ -1,0 +1,30 @@
+version: '3'
+services:
+  postgres:
+    image: postgres
+    container_name: producao
+    restart: unless-stopped
+    tty: true
+    networks:
+      - producao-network
+    environment:
+      POSTGRES_DB: producao
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    #ports:
+    #  - "5435:5432"
+    #volumes:
+    #  - ./db/data :/postgresql/data
+
+  producao:
+    build: .
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+    networks:
+      - producao-network
+
+networks:
+  producao-network:
+    driver: bridge
