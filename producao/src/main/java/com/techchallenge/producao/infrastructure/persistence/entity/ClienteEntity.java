@@ -17,6 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 public class ClienteEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq_gen")
+    @SequenceGenerator(name = "users_seq_gen", sequenceName = "cliente_seq", allocationSize = 1)
     private Long id;
     private String nome;
     private String cpf;
