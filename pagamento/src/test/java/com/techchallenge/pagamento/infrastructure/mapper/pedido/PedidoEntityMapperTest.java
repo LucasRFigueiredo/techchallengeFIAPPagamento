@@ -34,7 +34,7 @@ public class PedidoEntityMapperTest {
     @Test
     public void testPedidoEntityToPedido() {
         ClienteEntity clienteEntity = new ClienteEntity();
-        clienteEntity.setId("664c22ed062528092ab45298");
+        clienteEntity.setId(1L);
         PedidoEntity pedidoEntity = new PedidoEntity();
         pedidoEntity.setId(1L);
         pedidoEntity.setCliente(clienteEntity);
@@ -45,13 +45,13 @@ public class PedidoEntityMapperTest {
         produtos.add(produtoEntity);
         pedidoEntity.setProdutos(produtos);
 
-        when(clienteEntityMapper.clienteEntityToCliente(clienteEntity)).thenReturn(new Cliente("664c22ed062528092ab45298", "Fulano da silva", "12345678901", "fulano@email.com"));
+        when(clienteEntityMapper.clienteEntityToCliente(clienteEntity)).thenReturn(new Cliente(1L, "Fulano da silva", "12345678901", "fulano@email.com"));
         when(produtoEntityMapper.produtoEntityToProduto(produtoEntity)).thenReturn(new Produto());
 
         Pedido pedido = pedidoEntityMapper.pedidoEntityToPedido(pedidoEntity);
 
         assertEquals(1L, pedido.getId());
-        assertEquals("664c22ed062528092ab45298", pedido.getCliente().getId());
+        assertEquals(1L, pedido.getCliente().getId());
         assertEquals("Pendente", pedido.getStatus());
         assertEquals(1, pedido.getItens().size());
     }
@@ -61,7 +61,7 @@ public class PedidoEntityMapperTest {
         Pedido pedido = new Pedido();
         pedido.setId(1L);
         Cliente cliente = new Cliente();
-        cliente.setId("664c22ed062528092ab45298");
+        cliente.setId(1L);
         pedido.setCliente(cliente);
         pedido.setStatus("Pendente");
         Produto produto = new Produto();
@@ -70,13 +70,13 @@ public class PedidoEntityMapperTest {
         produtos.add(produto);
         pedido.setItens(produtos);
 
-        when(clienteEntityMapper.clienteToClienteEntity(cliente)).thenReturn(new ClienteEntity("664c22ed062528092ab45298", "Fulano da silva", "12345678901", "fulano@email.com", List.of(new PedidoEntity())));
+        when(clienteEntityMapper.clienteToClienteEntity(cliente)).thenReturn(new ClienteEntity(1L, "Fulano da silva", "12345678901", "fulano@email.com", List.of(new PedidoEntity())));
         when(produtoEntityMapper.produtoToProdutoEntity(produto)).thenReturn(new ProdutoEntity());
 
         PedidoEntity pedidoEntity = pedidoEntityMapper.pedidoToPedidoEntity(pedido);
 
         assertEquals(1L, pedidoEntity.getId());
-        assertEquals("664c22ed062528092ab45298", pedidoEntity.getCliente().getId());
+        assertEquals(1L, pedidoEntity.getCliente().getId());
         assertEquals("Pendente", pedidoEntity.getStatus());
         assertEquals(1, pedidoEntity.getProdutos().size());
     }

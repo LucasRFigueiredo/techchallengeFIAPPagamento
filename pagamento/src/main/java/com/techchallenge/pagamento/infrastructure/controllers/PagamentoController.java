@@ -42,4 +42,3 @@ public class PagamentoController {
         pagamentoService.reprovar(id);
     }
 }
-

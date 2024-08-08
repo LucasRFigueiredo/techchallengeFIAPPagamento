@@ -16,9 +16,10 @@ import java.util.List;
 @NoArgsConstructor
 public class ProdutoEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "prod_seq_gen")
-    @SequenceGenerator(name = "prod_seq_gen", sequenceName = "produto_seq", allocationSize = 1)
-    private Long Id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "produto_seq_gen")
+    @SequenceGenerator(name = "produto_seq_gen", sequenceName = "produto_seq", allocationSize = 1)
+    private Long id;
+
     private String tipo;
     private String nome;
     private String descricao;

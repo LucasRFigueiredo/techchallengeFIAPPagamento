@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
 public class CheckoutServiceImpl {
     private final CheckoutUseCase checkoutUseCase;
     private final CheckoutMapper checkoutMapper;
@@ -21,19 +25,24 @@ public class CheckoutServiceImpl {
         this.checkoutMapper = checkoutMapper;
     }
 
+    @Transactional
     public void criar(Pedido pedido) {
         BigDecimal total = new BigDecimal(0);
-        Checkout checkout = new Checkout();
-        checkout.setPedido(pedido);
-        for (Produto produto : checkout.getPedido().getItens()) {
+        for (Produto produto : pedido.getItens()) {
             total = total.add(BigDecimal.valueOf(produto.getPreco()));
         }
+
+        // Salvar pedido antes de criar o checkout
+        Pedido savedPedido = checkoutUseCase.salvarPedido(pedido);
+
+        Checkout checkout = new Checkout();
+        checkout.setPedido(savedPedido);
         checkout.setTotal(total);
         checkout.setPagamento("Aguardando pagamento");
         checkout.setStatus("Aguardando pagamento");
+
         checkoutUseCase.criar(checkout);
     }
-
 
     public List<CheckoutDTO> buscar() {
         List<Checkout> checkouts = checkoutUseCase.listar();

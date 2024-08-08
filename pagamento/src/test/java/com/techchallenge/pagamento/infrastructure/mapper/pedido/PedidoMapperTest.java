@@ -35,7 +35,7 @@ public class PedidoMapperTest {
         pedidoDTO.setId(1L);
         pedidoDTO.setStatus("Entregue");
         ClienteDTO clienteDTO = new ClienteDTO();
-        clienteDTO.setId("664c22ed062528092ab45298");
+        clienteDTO.setId(1L);
         pedidoDTO.setCliente(clienteDTO);
         List<ProdutoDTO> produtoDTOs = new ArrayList<>();
         ProdutoDTO produtoDTO = new ProdutoDTO();
@@ -59,7 +59,7 @@ public class PedidoMapperTest {
         pedido.setId(1L);
         pedido.setStatus("Entregue");
         Cliente cliente = new Cliente();
-        cliente.setId("664c22ed062528092ab45298");
+        cliente.setId(1L);
         pedido.setCliente(cliente);
         List<Produto> produtos = new ArrayList<>();
         Produto produto = new Produto();

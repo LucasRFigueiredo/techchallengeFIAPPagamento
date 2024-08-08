@@ -50,12 +50,12 @@ public class CheckoutRepositoryGatewayTest {
     @Transactional
     public void testCriar() {
         // Prepare data
-        Cliente cliente = new Cliente("664c22ed062528092ab45298", "João", "12345678900", "joao@example.com");
+        Cliente cliente = new Cliente(1L, "João", "12345678900", "joao@example.com");
         Produto produto = new Produto(1L, "Bebida", "Coca-Cola", "Refrigerante 350ml", 5.0);
         Pedido pedido = new Pedido(1L, cliente, "Pendente", Collections.singletonList(produto));
         Checkout checkout = new Checkout(1L, pedido, new BigDecimal("10.00"), "Cartão", "Pendente");
 
-        ClienteEntity clienteEntity = new ClienteEntity("664c22ed062528092ab45298", "João", "12345678900", "joao@example.com", null);
+        ClienteEntity clienteEntity = new ClienteEntity(1L, "João", "12345678900", "joao@example.com", null);
         ProdutoEntity produtoEntity = new ProdutoEntity(1L, "Bebida", "Coca-Cola", "Refrigerante 350ml", 5.0, null);
         PedidoEntity pedidoEntity = new PedidoEntity(1L, clienteEntity, "Pendente", Collections.singletonList(produtoEntity), null);
         CheckoutEntity checkoutEntity = new CheckoutEntity(1L, pedidoEntity, new BigDecimal("10.00"), "Cartão", "Pendente");
@@ -82,13 +82,13 @@ public class CheckoutRepositoryGatewayTest {
     @Test
     public void testListar() {
         // Prepare data
-        ClienteEntity clienteEntity = new ClienteEntity("664c22ed062528092ab45298", "João", "12345678900", "joao@example.com", null);
+        ClienteEntity clienteEntity = new ClienteEntity(1L, "João", "12345678900", "joao@example.com", null);
         ProdutoEntity produtoEntity = new ProdutoEntity(1L, "Bebida", "Coca-Cola", "Refrigerante 350ml", 5.0, null);
         PedidoEntity pedidoEntity = new PedidoEntity(1L, clienteEntity, "Pendente", Collections.singletonList(produtoEntity), null);
         CheckoutEntity checkoutEntity = new CheckoutEntity(1L, pedidoEntity, new BigDecimal("10.00"), "Cartão", "Pendente");
         List<CheckoutEntity> checkoutEntities = Collections.singletonList(checkoutEntity);
 
-        Cliente cliente = new Cliente("664c22ed062528092ab45298", "João", "12345678900", "joao@example.com");
+        Cliente cliente = new Cliente(1L, "João", "12345678900", "joao@example.com");
         Produto produto = new Produto(1L, "Bebida", "Coca-Cola", "Refrigerante 350ml", 5.0);
         Pedido pedido = new Pedido(1L, cliente, "Pendente", Collections.singletonList(produto));
         Checkout checkout = new Checkout(1L, pedido, new BigDecimal("10.00"), "Cartão", "Pendente");
@@ -108,12 +108,12 @@ public class CheckoutRepositoryGatewayTest {
     @Test
     public void testBuscar() {
         // Prepare data
-        ClienteEntity clienteEntity = new ClienteEntity("664c22ed062528092ab45298", "João", "12345678900", "joao@example.com", null);
+        ClienteEntity clienteEntity = new ClienteEntity(1L, "João", "12345678900", "joao@example.com", null);
         ProdutoEntity produtoEntity = new ProdutoEntity(1L, "Bebida", "Coca-Cola", "Refrigerante 350ml", 5.0, null);
         PedidoEntity pedidoEntity = new PedidoEntity(1L, clienteEntity, "Pendente", Collections.singletonList(produtoEntity), null);
         CheckoutEntity checkoutEntity = new CheckoutEntity(1L, pedidoEntity, new BigDecimal("10.00"), "Cartão", "Pendente");
 
-        Cliente cliente = new Cliente("664c22ed062528092ab45298", "João", "12345678900", "joao@example.com");
+        Cliente cliente = new Cliente(1L, "João", "12345678900", "joao@example.com");
         Produto produto = new Produto(1L, "Bebida", "Coca-Cola", "Refrigerante 350ml", 5.0);
         Pedido pedido = new Pedido(1L, cliente, "Pendente", Collections.singletonList(produto));
         Checkout checkout = new Checkout(1L, pedido, new BigDecimal("10.00"), "Cartão", "Pendente");
@@ -131,8 +131,7 @@ public class CheckoutRepositoryGatewayTest {
 
     @Test
     public void testBuscarPorStatusPagamento() {
-        // Prepare data
-        ClienteEntity clienteEntity = new ClienteEntity("664c22ed062528092ab45298", "João", "12345678900", "joao@example.com", null);
+        ClienteEntity clienteEntity = new ClienteEntity(1L, "João", "12345678900", "joao@example.com", null);
         ProdutoEntity produtoEntity = new ProdutoEntity(1L, "Bebida", "Coca-Cola", "Refrigerante 350ml", 5.0, null);
         PedidoEntity pedidoEntity = new PedidoEntity(1L, clienteEntity, "Pendente", Collections.singletonList(produtoEntity), null);
         CheckoutEntity checkoutEntity = new CheckoutEntity(1L, pedidoEntity, new BigDecimal("10.00"), "Cartão", "Pago");
@@ -141,12 +140,10 @@ public class CheckoutRepositoryGatewayTest {
         Checkout checkout = new Checkout(1L, new Pedido(), new BigDecimal("10.00"), "Cartão", "Pago");
 
         when(springCheckoutRepository.findByStatusPagamento("Pago")).thenReturn(checkoutEntities);
-        when(checkoutEntityMapper.checkoutEntitiesToCheckouts(checkoutEntities)).thenReturn(Collections.singletonList(checkout));
+        when(checkoutEntityMapper.checkoutEntityToCheckout(checkoutEntity)).thenReturn(checkout);
 
-        // Execute the method
         List<Checkout> result = checkoutRepositoryGateway.buscarPorStatusPagamento("Pago");
 
-        // Verify results
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(checkout, result.get(0));

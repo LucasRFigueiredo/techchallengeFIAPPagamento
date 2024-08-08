@@ -26,14 +26,16 @@ public class Scheduler {
 
     private void atualizarStatus() {
         List<Checkout> checkoutsAprovados = checkoutUseCase.buscarPorStatusPagamento("Aprovado");
-        for (Checkout checkout : checkoutsAprovados) {
-            String statusAtual = checkout.getStatus();
-            if ("Em preparação".equals(statusAtual)) {
-                checkout.setStatus("Pronto");
-            } else if ("Aguardando pagamento".equals(statusAtual)) {
-                checkout.setStatus("Em preparação");
+        if (checkoutsAprovados != null && !checkoutsAprovados.isEmpty()) {
+            for (Checkout checkout : checkoutsAprovados) {
+                String statusAtual = checkout.getStatus();
+                if ("Em preparação".equals(statusAtual)) {
+                    checkout.setStatus("Pronto");
+                } else if ("Aguardando pagamento".equals(statusAtual)) {
+                    checkout.setStatus("Em preparação");
+                }
+                checkoutUseCase.atualizarStatus(checkout);
             }
-            checkoutUseCase.atualizarStatus(checkout);
         }
     }
 }

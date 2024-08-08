@@ -16,19 +16,22 @@ import java.util.List;
 @NoArgsConstructor
 public class PedidoEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ped_seq_gen")
-    @SequenceGenerator(name = "ped_seq_gen", sequenceName = "pedido_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pedido_seq_gen")
+    @SequenceGenerator(name = "pedido_seq_gen", sequenceName = "pedido_seq", allocationSize = 1)
     private Long id;
+
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    @JoinColumn(name = "Cliente_id")
+    @JoinColumn(name = "cliente_id")
     private ClienteEntity cliente;
+
     private String status;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "Pedido_Produto",
-            joinColumns = @JoinColumn(name = "Pedido_id"),
-            inverseJoinColumns = @JoinColumn(name = "Produto_id"))
+            joinColumns = @JoinColumn(name = "pedido_id"),
+            inverseJoinColumns = @JoinColumn(name = "produto_id"))
     private List<ProdutoEntity> produtos;
+
     @OneToOne(mappedBy = "pedido", cascade = CascadeType.PERSIST)
     private CheckoutEntity checkout;
 }
