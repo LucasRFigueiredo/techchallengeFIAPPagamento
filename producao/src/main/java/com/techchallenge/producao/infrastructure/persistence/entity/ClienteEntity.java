@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ClienteEntity {
     @Id
-    private String id;
+    private Long id;
     private String nome;
     private String cpf;
     private String email;

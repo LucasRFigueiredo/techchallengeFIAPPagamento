@@ -12,7 +12,7 @@ public class PedidoEntityTest {
     @Test
     public void testPedidoEntity() {
         ClienteEntity cliente = new ClienteEntity();
-        cliente.setId("664c22ed062528092ab45298");
+        cliente.setId(1L);
         cliente.setNome("Cliente Teste");
 
         ProdutoEntity produto1 = new ProdutoEntity();

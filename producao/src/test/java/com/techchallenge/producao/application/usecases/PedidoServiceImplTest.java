@@ -7,9 +7,13 @@ import java.util.*;
 
 import com.techchallenge.producao.application.dto.ClienteDTO;
 import com.techchallenge.producao.application.dto.ProdutoDTO;
+import com.techchallenge.producao.application.events.EventPublisher;
 import com.techchallenge.producao.domain.Cliente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import com.techchallenge.producao.application.dto.PedidoDTO;
 import com.techchallenge.producao.application.gateways.pedido.CriarPedidoUseCase;
@@ -20,8 +24,6 @@ import com.techchallenge.producao.domain.Produto;
 import com.techchallenge.producao.infrastructure.gateways.CheckoutWebClient;
 import com.techchallenge.producao.infrastructure.gateways.ClienteWebClient;
 import com.techchallenge.producao.infrastructure.mapper.pedido.PedidoMapper;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 public class PedidoServiceImplTest {
     @Mock
@@ -36,20 +38,14 @@ public class PedidoServiceImplTest {
     private ClienteWebClient clienteWebClient;
     @Mock
     private CheckoutWebClient checkoutWebClient;
+    @Mock
+    private EventPublisher eventPublisher;
     @InjectMocks
     private PedidoServiceImpl pedidoService;
 
     @BeforeEach
     public void setUp() {
-        criarPedidoUseCase = mock(CriarPedidoUseCase.class);
-        listarPedidoUseCase = mock(ListarPedidoUseCase.class);
-        buscarProdutoUseCase = mock(BuscarProdutoUseCase.class);
-        pedidoMapper = mock(PedidoMapper.class);
-        clienteWebClient = mock(ClienteWebClient.class);
-        checkoutWebClient = mock(CheckoutWebClient.class);
-
-        pedidoService = new PedidoServiceImpl(criarPedidoUseCase, listarPedidoUseCase, buscarProdutoUseCase,
-                pedidoMapper, clienteWebClient, checkoutWebClient);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -58,40 +54,35 @@ public class PedidoServiceImplTest {
         pedidoDTO.setId(1L);
         pedidoDTO.setStatus("Entregue");
         ClienteDTO clienteDTO = new ClienteDTO();
-        clienteDTO.setId("1");
+        clienteDTO.setId(1L);
         clienteDTO.setNome("Fulano da Silva");
         clienteDTO.setCpf("12345678901");
         pedidoDTO.setCliente(clienteDTO);
-        List<ProdutoDTO> produtoDTOs = new ArrayList<>();
-        ProdutoDTO produtoDTO = new ProdutoDTO();
-        produtoDTO.setId(1L);
-        produtoDTO.setNome("Hambúrguer");
-        produtoDTO.setDescricao("Hambúrguer delicioso");
-        produtoDTOs.add(produtoDTO);
-        pedidoDTO.setItens(produtoDTOs);
-        when(clienteWebClient.getClienteByCPF(anyString())).thenReturn(pedidoDTO.getCliente());
 
         ProdutoDTO produtoDTO1 = new ProdutoDTO();
         ProdutoDTO produtoDTO2 = new ProdutoDTO();
-        produtoDTO1.setId(1L); // Definindo IDs de produto válidos
-        produtoDTO2.setId(2L); // Definindo IDs de produto válidos
+        produtoDTO1.setId(1L);
+        produtoDTO1.setNome("Hambúrguer");
+        produtoDTO1.setDescricao("Hambúrguer delicioso");
+        produtoDTO2.setId(2L);
+        produtoDTO2.setNome("Hambúrguer");
+        produtoDTO2.setDescricao("Hambúrguer delicioso");
         pedidoDTO.setItens(Arrays.asList(produtoDTO1, produtoDTO2));
-        when(buscarProdutoUseCase.buscar(1L)).thenReturn(new Produto(1L,"lanche", "hamburger com bacon", "hamburger com queijo e bacon", 15.0));
-        when(buscarProdutoUseCase.buscar(2L)).thenReturn(new Produto(2L,"lanche", "hamburger", "hamburger com queijo", 10.0));
+
+        when(clienteWebClient.getClienteByCPF(anyString())).thenReturn(clienteDTO);
+
+        Produto produto1 = new Produto(1L, "lanche", "hamburger com bacon", "hamburger com queijo e bacon", 15.0);
+        Produto produto2 = new Produto(2L, "lanche", "hamburger", "hamburger com queijo", 10.0);
+        when(buscarProdutoUseCase.buscar(1L)).thenReturn(produto1);
+        when(buscarProdutoUseCase.buscar(2L)).thenReturn(produto2);
 
         Pedido pedido = new Pedido();
         pedido.setId(1L);
         pedido.setStatus("Entregue");
         Cliente cliente = new Cliente();
-        cliente.setId("664c22ed062528092ab45298");
+        cliente.setId(1L);
         pedido.setCliente(cliente);
-        List<Produto> produtos = new ArrayList<>();
-        Produto produto = new Produto();
-        produto.setId(1L);
-        produto.setNome("Hambúrguer");
-        produto.setDescricao("Hambúrguer delicioso");
-        produtos.add(produto);
-        pedido.setItens(produtos);
+        pedido.setItens(Arrays.asList(produto1, produto2));
         when(pedidoMapper.pedidoDTOToPedido(pedidoDTO)).thenReturn(pedido);
 
         when(criarPedidoUseCase.criar(pedido)).thenReturn(1L);
@@ -99,8 +90,9 @@ public class PedidoServiceImplTest {
         pedidoService.criar(pedidoDTO);
 
         verify(clienteWebClient).getClienteByCPF(pedidoDTO.getCliente().getCpf());
-        verify(buscarProdutoUseCase).buscar(anyLong());
+        verify(buscarProdutoUseCase, times(2)).buscar(anyLong());
         verify(criarPedidoUseCase).criar(pedido);
+        verify(eventPublisher).publishOrderCreatedEvent(pedidoDTO);
     }
 
     @Test
@@ -109,7 +101,7 @@ public class PedidoServiceImplTest {
         pedido.setId(1L);
         pedido.setStatus("Entregue");
         Cliente cliente = new Cliente();
-        cliente.setId("664c22ed062528092ab45298");
+        cliente.setId(1L);
         pedido.setCliente(cliente);
         List<Produto> produtos = new ArrayList<>();
         Produto produto = new Produto();
@@ -119,8 +111,7 @@ public class PedidoServiceImplTest {
         produtos.add(produto);
         pedido.setItens(produtos);
         when(listarPedidoUseCase.listar()).thenReturn(Arrays.asList(pedido));
-        PedidoDTO pedidoDTO = pedidoMapper.pedidoToPedidoDTO(pedido);
-
+        PedidoDTO pedidoDTO = new PedidoDTO();
         when(pedidoMapper.pedidoToPedidoDTO(pedido)).thenReturn(pedidoDTO);
 
         List<PedidoDTO> resultado = pedidoService.listar();

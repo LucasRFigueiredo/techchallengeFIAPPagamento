@@ -17,12 +17,12 @@ public class ClienteEntityTest {
         pedido.setId(1L);
         pedidos.add(pedido);
         ClienteEntity cliente = new ClienteEntity();
-        cliente.setId("664c22ed062528092ab45298");
+        cliente.setId(1L);
         cliente.setNome("Fulano da Silva");
         cliente.setCpf("12345678901");
         cliente.setEmail("fulano@email.com");
         cliente.setPedidos(pedidos);
-        assertEquals("664c22ed062528092ab45298", cliente.getId());
+        assertEquals(1L, cliente.getId());
         assertEquals("Fulano da Silva", cliente.getNome());
         assertEquals("12345678901", cliente.getCpf());
         assertEquals("fulano@email.com", cliente.getEmail());

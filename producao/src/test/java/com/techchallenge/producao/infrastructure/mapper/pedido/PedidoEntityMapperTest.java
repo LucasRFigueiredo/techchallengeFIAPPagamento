@@ -37,7 +37,7 @@ public class PedidoEntityMapperTest {
         pedidoEntity.setId(1L);
         pedidoEntity.setStatus("Entregue");
         ClienteEntity clienteEntity = new ClienteEntity();
-        clienteEntity.setId("664c22ed062528092ab45298");
+        clienteEntity.setId(1L);
         pedidoEntity.setCliente(clienteEntity);
         List<ProdutoEntity> produtoEntities = new ArrayList<>();
         ProdutoEntity produtoEntity = new ProdutoEntity();
@@ -61,7 +61,7 @@ public class PedidoEntityMapperTest {
         pedido.setId(1L);
         pedido.setStatus("Entregue");
         Cliente cliente = new Cliente();
-        cliente.setId("664c22ed062528092ab45298");
+        cliente.setId(1L);
         pedido.setCliente(cliente);
         List<Produto> produtos = new ArrayList<>();
         Produto produto = new Produto();

@@ -1,5 +1,6 @@
 package com.techchallenge.producao.configuration;
 
+import com.techchallenge.producao.application.events.EventPublisher;
 import com.techchallenge.producao.application.gateways.pedido.CriarPedidoUseCase;
 import com.techchallenge.producao.application.gateways.pedido.ListarPedidoUseCase;
 import com.techchallenge.producao.application.gateways.produto.*;
@@ -79,15 +80,15 @@ public class BeanConfiguration {
     @Bean
     public ProdutoServiceImpl produtoService(CriarProdutoUseCase criarProdutoUseCase, BuscarTipoProdutoUseCase buscarTipoProdutoUseCase,
                                              BuscarProdutoUseCase buscarProdutoUseCase, EditarProdutoUseCase editarProdutoUseCase,
-                                             RemoverProdutoUseCase removerProdutoUseCase, ProdutoMapper produtoMapper) {
-        return new ProdutoServiceImpl(criarProdutoUseCase, buscarTipoProdutoUseCase, buscarProdutoUseCase, editarProdutoUseCase, removerProdutoUseCase, produtoMapper);
+                                             RemoverProdutoUseCase removerProdutoUseCase, ProdutoMapper produtoMapper, EventPublisher eventPublisher) {
+        return new ProdutoServiceImpl(criarProdutoUseCase, buscarTipoProdutoUseCase, buscarProdutoUseCase, editarProdutoUseCase, removerProdutoUseCase, produtoMapper, eventPublisher);
     }
 
     @Bean
     public PedidoServiceImpl pedidoService(CriarPedidoUseCase criarPedidoUseCase, ListarPedidoUseCase listarPedidoUseCase,
                                            BuscarProdutoUseCase buscarProdutoUseCase, PedidoMapper pedidoMapper,
-                                           ClienteWebClient clienteWebClient, CheckoutWebClient checkoutWebClient) {
-        return new PedidoServiceImpl(criarPedidoUseCase, listarPedidoUseCase, buscarProdutoUseCase, pedidoMapper, clienteWebClient, checkoutWebClient);
+                                           ClienteWebClient clienteWebClient, CheckoutWebClient checkoutWebClient, EventPublisher eventPublisher) {
+        return new PedidoServiceImpl(criarPedidoUseCase, listarPedidoUseCase, buscarProdutoUseCase, pedidoMapper, clienteWebClient, checkoutWebClient, eventPublisher);
     }
 
     @Bean

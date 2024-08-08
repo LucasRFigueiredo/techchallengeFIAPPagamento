@@ -12,7 +12,7 @@ public class PedidoTest {
     @Test
     public void testPedido() {
         Cliente cliente = new Cliente();
-        cliente.setId("664c22ed062528092ab45298");
+        cliente.setId(1L);
         List<Produto> itens = new ArrayList<>();
         Produto produto1 = new Produto();
         produto1.setId(1L);

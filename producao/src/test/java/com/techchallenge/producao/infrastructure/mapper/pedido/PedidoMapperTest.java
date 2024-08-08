@@ -36,7 +36,7 @@ public class PedidoMapperTest {
         pedidoDTO.setId(1L);
         pedidoDTO.setStatus("Entregue");
         ClienteDTO clienteDTO = new ClienteDTO();
-        clienteDTO.setId("1");
+        clienteDTO.setId(1L);
         pedidoDTO.setCliente(clienteDTO);
         List<ProdutoDTO> produtoDTOs = new ArrayList<>();
         ProdutoDTO produtoDTO = new ProdutoDTO();
@@ -50,7 +50,7 @@ public class PedidoMapperTest {
 
         assertEquals(pedidoDTO.getId(), pedido.getId());
         assertEquals(pedidoDTO.getStatus(), pedido.getStatus());
-        assertEquals(pedidoDTO.getCliente().getId(), pedido.getCliente().getId().toString());
+        assertEquals(pedidoDTO.getCliente().getId(), pedido.getCliente().getId());
         assertEquals(pedidoDTO.getItens().size(), pedido.getItens().size());
     }
 
@@ -60,7 +60,7 @@ public class PedidoMapperTest {
         pedido.setId(1L);
         pedido.setStatus("Entregue");
         Cliente cliente = new Cliente();
-        cliente.setId("664c22ed062528092ab45298");
+        cliente.setId(1L);
         pedido.setCliente(cliente);
         List<Produto> produtos = new ArrayList<>();
         Produto produto = new Produto();
@@ -73,7 +73,7 @@ public class PedidoMapperTest {
 
         assertEquals(pedido.getId(), pedidoDTO.getId());
         assertEquals(pedido.getStatus(), pedidoDTO.getStatus());
-        assertEquals(pedido.getCliente().getId().toString(), pedidoDTO.getCliente().getId());
+        assertEquals(pedido.getCliente().getId(), pedidoDTO.getCliente().getId());
         assertEquals(pedido.getItens().size(), pedidoDTO.getItens().size());
     }
 }

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.List;
 
+import com.techchallenge.producao.application.events.EventPublisher;
 import com.techchallenge.producao.application.gateways.produto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ public class ProdutoServiceImplTest {
     private EditarProdutoUseCase editarProdutoUseCase;
     private RemoverProdutoUseCase removerProdutoUseCase;
     private ProdutoMapper produtoMapper;
+    private EventPublisher eventPublisher;
     private ProdutoServiceImpl produtoService;
 
     @BeforeEach
@@ -33,7 +35,7 @@ public class ProdutoServiceImplTest {
         produtoMapper = mock(ProdutoMapper.class);
 
         produtoService = new ProdutoServiceImpl(criarProdutoUseCase, buscarTipoProdutoUseCase, buscarProdutoUseCase,
-                editarProdutoUseCase, removerProdutoUseCase, produtoMapper);
+                editarProdutoUseCase, removerProdutoUseCase, produtoMapper, eventPublisher);
     }
 
     @Test

@@ -1,5 +1,5 @@
 CREATE TABLE Cliente (
-id VARCHAR PRIMARY KEY,
+id SERIAL PRIMARY KEY,
 nome VARCHAR(255),
 cpf VARCHAR(11),
 email VARCHAR(255)
@@ -16,7 +16,7 @@ preco DOUBLE PRECISION
 
 CREATE TABLE Pedido (
 id SERIAL PRIMARY KEY,
-cliente_id VARCHAR REFERENCES Cliente(id),
+cliente_id SERIAL REFERENCES Cliente(id),
 status VARCHAR(255)
 );
 
@@ -35,6 +35,9 @@ status VARCHAR(255),
 FOREIGN KEY (Pedido_id) REFERENCES Pedido(id)
 );
 
+CREATE SEQUENCE cliente_seq
+INCREMENT 1
+START 1;
 
 CREATE SEQUENCE produto_seq
 INCREMENT 1
