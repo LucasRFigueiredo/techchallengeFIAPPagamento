@@ -2,6 +2,7 @@ package com.techchallenge.pagamento.infrastructure.gateways;
 
 import com.techchallenge.pagamento.application.gateways.checkout.CheckoutUseCase;
 import com.techchallenge.pagamento.domain.Checkout;
+import com.techchallenge.pagamento.domain.Cliente;
 import com.techchallenge.pagamento.domain.Pedido;
 import com.techchallenge.pagamento.domain.Produto;
 import com.techchallenge.pagamento.infrastructure.mapper.checkout.CheckoutEntityMapper;
@@ -9,102 +10,95 @@ import com.techchallenge.pagamento.infrastructure.mapper.cliente.ClienteEntityMa
 import com.techchallenge.pagamento.infrastructure.mapper.pedido.PedidoEntityMapper;
 import com.techchallenge.pagamento.infrastructure.mapper.produto.ProdutoEntityMapper;
 import com.techchallenge.pagamento.infrastructure.persistence.entity.CheckoutEntity;
+import com.techchallenge.pagamento.infrastructure.persistence.entity.ClienteEntity;
 import com.techchallenge.pagamento.infrastructure.persistence.entity.PedidoEntity;
+import com.techchallenge.pagamento.infrastructure.persistence.entity.ProdutoEntity;
 import com.techchallenge.pagamento.infrastructure.persistence.repository.checkout.SpringCheckoutRepository;
+import com.techchallenge.pagamento.infrastructure.persistence.repository.cliente.SpringClienteRepository;
 import com.techchallenge.pagamento.infrastructure.persistence.repository.pedido.SpringPedidoRepository;
-
+import com.techchallenge.pagamento.infrastructure.persistence.repository.produto.SpringProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class CheckoutRepositoryGateway implements CheckoutUseCase {
-
-    private final SpringCheckoutRepository springCheckoutRepository;
-    private final SpringPedidoRepository springPedidoRepository;
-    private final CheckoutEntityMapper checkoutEntityMapper;
-    private final PedidoEntityMapper pedidoEntityMapper;
+    private final SpringClienteRepository clienteRepository;
+    private final SpringProdutoRepository produtoRepository;
+    private final SpringPedidoRepository pedidoRepository;
+    private final SpringCheckoutRepository checkoutRepository;
     private final ClienteEntityMapper clienteEntityMapper;
     private final ProdutoEntityMapper produtoEntityMapper;
-    private final EntityManager entityManager;
+    private final PedidoEntityMapper pedidoEntityMapper;
+    private final CheckoutEntityMapper checkoutEntityMapper;
 
     @Autowired
-    public CheckoutRepositoryGateway(SpringCheckoutRepository springCheckoutRepository,
-                                     SpringPedidoRepository springPedidoRepository,
-                                     CheckoutEntityMapper checkoutEntityMapper,
-                                     PedidoEntityMapper pedidoEntityMapper, ClienteEntityMapper clienteEntityMapper,
-                                     ProdutoEntityMapper produtoEntityMapper, EntityManager entityManager) {
-        this.springCheckoutRepository = springCheckoutRepository;
-        this.springPedidoRepository = springPedidoRepository;
-        this.checkoutEntityMapper = checkoutEntityMapper;
-        this.pedidoEntityMapper = pedidoEntityMapper;
+    public CheckoutRepositoryGateway(SpringClienteRepository clienteRepository, SpringProdutoRepository produtoRepository, SpringPedidoRepository pedidoRepository, SpringCheckoutRepository checkoutRepository, ClienteEntityMapper clienteEntityMapper, ProdutoEntityMapper produtoEntityMapper, PedidoEntityMapper pedidoEntityMapper, CheckoutEntityMapper checkoutEntityMapper) {
+        this.clienteRepository = clienteRepository;
+        this.produtoRepository = produtoRepository;
+        this.pedidoRepository = pedidoRepository;
+        this.checkoutRepository = checkoutRepository;
         this.clienteEntityMapper = clienteEntityMapper;
         this.produtoEntityMapper = produtoEntityMapper;
-        this.entityManager = entityManager;
+        this.pedidoEntityMapper = pedidoEntityMapper;
+        this.checkoutEntityMapper = checkoutEntityMapper;
     }
 
     @Override
-    @Transactional
+    public Cliente salvarCliente(Cliente cliente) {
+        ClienteEntity clienteEntity = clienteEntityMapper.clienteToClienteEntity(cliente);
+        ClienteEntity savedClienteEntity = clienteRepository.save(clienteEntity);
+        return clienteEntityMapper.clienteEntityToCliente(savedClienteEntity);
+    }
+
+    @Override
+    public Produto salvarProduto(Produto produto) {
+        ProdutoEntity produtoEntity = produtoEntityMapper.produtoToProdutoEntity(produto);
+        ProdutoEntity savedProdutoEntity = produtoRepository.save(produtoEntity);
+        return produtoEntityMapper.produtoEntityToProduto(savedProdutoEntity);
+    }
+
+    @Override
+    public Pedido salvarPedido(Pedido pedido) {
+        PedidoEntity pedidoEntity = pedidoEntityMapper.pedidoToPedidoEntity(pedido);
+        PedidoEntity savedPedidoEntity = pedidoRepository.save(pedidoEntity);
+        return pedidoEntityMapper.pedidoEntityToPedido(savedPedidoEntity);
+    }
+
+    @Override
     public void criar(Checkout checkout) {
         CheckoutEntity checkoutEntity = checkoutEntityMapper.checkoutToCheckoutEntity(checkout);
-        springCheckoutRepository.save(checkoutEntity);
+        checkoutRepository.save(checkoutEntity);
     }
 
     @Override
     public List<Checkout> listar() {
-        return springCheckoutRepository.findAll().stream()
+        List<CheckoutEntity> checkoutEntities = checkoutRepository.findAll();
+        return checkoutEntities.stream()
                 .map(checkoutEntityMapper::checkoutEntityToCheckout)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Checkout> buscarPorStatusPagamento(String statusPagamento) {
-        return springCheckoutRepository.findByStatusPagamento(statusPagamento).stream()
+        List<CheckoutEntity> checkoutEntities = checkoutRepository.findByStatusPagamento(statusPagamento);
+        return checkoutEntities.stream()
                 .map(checkoutEntityMapper::checkoutEntityToCheckout)
                 .collect(Collectors.toList());
     }
 
     @Override
-    @Transactional
-    public Pedido salvarPedido(Pedido pedido) {
-        PedidoEntity pedidoEntity = pedidoEntityMapper.pedidoToPedidoEntity(pedido);
-        PedidoEntity savedPedidoEntity = springPedidoRepository.save(pedidoEntity);
-        return mapToPedidoDomain(savedPedidoEntity);
-    }
-
-    @Override
-    @Transactional
     public void atualizarStatus(Checkout checkout) {
         CheckoutEntity checkoutEntity = checkoutEntityMapper.checkoutToCheckoutEntity(checkout);
-        springCheckoutRepository.save(checkoutEntity);
+        checkoutRepository.save(checkoutEntity);
     }
 
     @Override
     public Checkout buscar(Long id) {
-        return springCheckoutRepository.findById(id)
-                .map(checkoutEntityMapper::checkoutEntityToCheckout)
-                .orElse(null);
-    }
-
-
-    private Pedido mapToPedidoDomain(PedidoEntity pedidoEntity) {
-        return new Pedido(
-                pedidoEntity.getId(),
-                clienteEntityMapper.clienteEntityToCliente(pedidoEntity.getCliente()),
-                pedidoEntity.getStatus(),
-                pedidoEntity.getProdutos().stream()
-                        .map(produtoEntity -> new Produto(
-                                produtoEntity.getId(),
-                                produtoEntity.getTipo(),
-                                produtoEntity.getNome(),
-                                produtoEntity.getDescricao(),
-                                produtoEntity.getPreco()))
-                        .collect(Collectors.toList())
-        );
+        Optional<CheckoutEntity> checkoutEntityOptional = checkoutRepository.findById(id);
+        return checkoutEntityOptional.map(checkoutEntityMapper::checkoutEntityToCheckout).orElse(null);
     }
 }

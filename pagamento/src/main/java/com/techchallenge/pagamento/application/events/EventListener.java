@@ -2,6 +2,7 @@ package com.techchallenge.pagamento.application.events;
 
 import com.techchallenge.pagamento.application.dto.PedidoDTO;
 import com.techchallenge.pagamento.application.usecases.CheckoutServiceImpl;
+import com.techchallenge.pagamento.configuration.RabbitMQConfig;
 import com.techchallenge.pagamento.infrastructure.mapper.pedido.PedidoMapper;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,18 @@ public class EventListener {
         this.pedidoMapper = pedidoMapper;
     }
 
-    @RabbitListener(queues = "checkoutQueue")
+    @RabbitListener(queues = RabbitMQConfig.CHECKOUT_QUEUE)
     public void handleCheckout(PedidoDTO pedidoDTO) {
         checkoutService.criar(pedidoMapper.pedidoDTOToPedido(pedidoDTO));
     }
-}
 
+    @RabbitListener(queues = RabbitMQConfig.NOTIFICATION_QUEUE)
+    public void handleNotification(String message) {
+        System.out.println("Notificação para o cliente: " + message);
+    }
+
+    @RabbitListener(queues = RabbitMQConfig.KITCHEN_QUEUE)
+    public void handleKitchenOrder(String message) {
+        System.out.println("Pedido para a cozinha: " + message);
+    }
+}

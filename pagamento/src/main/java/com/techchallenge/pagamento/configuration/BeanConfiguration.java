@@ -1,5 +1,6 @@
 package com.techchallenge.pagamento.configuration;
 
+import com.techchallenge.pagamento.application.events.EventPublisher;
 import com.techchallenge.pagamento.application.events.PaymentService;
 import com.techchallenge.pagamento.application.gateways.checkout.CheckoutUseCase;
 import com.techchallenge.pagamento.application.usecases.CheckoutServiceImpl;
@@ -12,13 +13,12 @@ import com.techchallenge.pagamento.infrastructure.mapper.checkout.CheckoutMapper
 import com.techchallenge.pagamento.infrastructure.mapper.cliente.ClienteEntityMapper;
 import com.techchallenge.pagamento.infrastructure.mapper.cliente.ClienteMapper;
 import com.techchallenge.pagamento.infrastructure.mapper.pedido.PedidoEntityMapper;
-import com.techchallenge.pagamento.infrastructure.mapper.pedido.PedidoMapper;
 import com.techchallenge.pagamento.infrastructure.mapper.produto.ProdutoEntityMapper;
 import com.techchallenge.pagamento.infrastructure.persistence.repository.checkout.SpringCheckoutRepository;
 import com.techchallenge.pagamento.infrastructure.persistence.repository.cliente.SpringClienteRepository;
 import com.techchallenge.pagamento.infrastructure.persistence.repository.pedido.SpringPedidoRepository;
+import com.techchallenge.pagamento.infrastructure.persistence.repository.produto.SpringProdutoRepository;
 import com.techchallenge.pagamento.infrastructure.scheduler.Scheduler;
-import jakarta.persistence.EntityManager;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -39,31 +39,31 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "com.techchallenge.pagamento.infrastructure.persistence.repository")
 public class BeanConfiguration {
     @Bean
-    public CheckoutUseCase checkoutUseCase(SpringCheckoutRepository springCheckoutRepository,
-                                           SpringPedidoRepository springPedidoRepository,
-                                           CheckoutEntityMapper checkoutEntityMapper,
-                                           PedidoEntityMapper pedidoEntityMapper, ClienteEntityMapper clienteEntityMapper,
-                                           ProdutoEntityMapper produtoEntityMapper, EntityManager entityManager) {
-        return new CheckoutRepositoryGateway(springCheckoutRepository, springPedidoRepository, checkoutEntityMapper, pedidoEntityMapper, clienteEntityMapper,
-                produtoEntityMapper, entityManager);
+    public CheckoutUseCase checkoutUseCase(SpringClienteRepository clienteRepository, SpringProdutoRepository produtoRepository,
+                                           SpringPedidoRepository pedidoRepository, SpringCheckoutRepository checkoutRepository,
+                                           ClienteEntityMapper clienteEntityMapper, ProdutoEntityMapper produtoEntityMapper,
+                                           PedidoEntityMapper pedidoEntityMapper, CheckoutEntityMapper checkoutEntityMapper) {
+        return new CheckoutRepositoryGateway(clienteRepository, produtoRepository, pedidoRepository, checkoutRepository, clienteEntityMapper, produtoEntityMapper, pedidoEntityMapper, checkoutEntityMapper);
     }
 
     @Bean
-    public CheckoutServiceImpl checkoutService(CheckoutUseCase checkoutUseCase, CheckoutMapper checkoutMapper) {
-        return new CheckoutServiceImpl(checkoutUseCase, checkoutMapper);
+    public CheckoutServiceImpl checkoutService(CheckoutUseCase checkoutUseCase, CheckoutMapper checkoutMapper, EventPublisher eventPublisher) {
+        return new CheckoutServiceImpl(checkoutUseCase, checkoutMapper, eventPublisher);
     }
 
     @Bean
     PagamentoServiceImpl pagamentoService(CheckoutUseCase checkoutUseCase, PaymentService paymentService, CheckoutMapper checkoutMapper) {
         return new PagamentoServiceImpl(checkoutUseCase, paymentService, checkoutMapper);
     }
+
     @Bean
     public ClienteServiceImpl clienteService(SpringClienteRepository springClienteRepository, ClienteMapper clienteMapper, ClienteEntityMapper clienteEntityMapper) {
         return new ClienteServiceImpl(springClienteRepository, clienteMapper, clienteEntityMapper);
     }
+
     @Bean
-    public PedidoServiceImpl pedidoService(SpringPedidoRepository springPedidoRepository, PedidoMapper pedidoMapper, PedidoEntityMapper pedidoEntityMapper) {
-        return new PedidoServiceImpl(springPedidoRepository, pedidoMapper, pedidoEntityMapper);
+    public PedidoServiceImpl pedidoService(SpringPedidoRepository springPedidoRepository, SpringProdutoRepository springProdutoRepository, SpringClienteRepository springClienteRepository, ClienteEntityMapper clienteEntityMapper, ProdutoEntityMapper produtoEntityMapper) {
+        return new PedidoServiceImpl(springPedidoRepository, springProdutoRepository, springClienteRepository, clienteEntityMapper, produtoEntityMapper);
     }
 
     @Bean

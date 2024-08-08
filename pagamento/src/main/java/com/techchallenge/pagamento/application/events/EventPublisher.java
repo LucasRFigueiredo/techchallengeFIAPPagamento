@@ -22,13 +22,19 @@ public class EventPublisher {
         rabbitTemplate.convertAndSend(RabbitMQConfig.PAYMENT_EXCHANGE, "", checkoutDTO);
     }
 
-    public void publishPaymentUpdatedEvent(CheckoutDTO checkoutDTO) {
-        logger.info("Publicando evento de pagamento atualizado: {}", checkoutDTO);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.PAYMENT_EXCHANGE, "", checkoutDTO);
+    public void publishPaymentApprovedEvent(String orderId) {
+        logger.info("Publicando evento de pagamento aprovado para pedido: {}", orderId);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.PAYMENT_EXCHANGE, RabbitMQConfig.PAYMENT_APPROVED_ROUTING_KEY, orderId);
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.PAYMENT_EXCHANGE, RabbitMQConfig.NOTIFICATION_QUEUE, "Pagamento aprovado para o pedido: " + orderId);
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.PAYMENT_EXCHANGE, RabbitMQConfig.KITCHEN_QUEUE, "Novo pedido aprovado: " + orderId);
     }
 
-    public void publishPaymentDeletedEvent(CheckoutDTO checkoutDTO) {
-        logger.info("Publicando evento de pagamento deletado: {}", checkoutDTO);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.PAYMENT_EXCHANGE, "", checkoutDTO);
+    public void publishPaymentRejectedEvent(String orderId) {
+        logger.info("Publicando evento de pagamento rejeitado para pedido: {}", orderId);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.PAYMENT_EXCHANGE, RabbitMQConfig.PAYMENT_REJECTED_ROUTING_KEY, orderId);
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.PAYMENT_EXCHANGE, RabbitMQConfig.NOTIFICATION_QUEUE, "Pagamento rejeitado para o pedido: " + orderId);
     }
 }
